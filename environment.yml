@@ -1,0 +1,12 @@
+name: tvm-torchbench
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - pytorch=1.11.0=cuda112py310h51fe464_202
+  - torchvision
+  - numpy
+  - pip
+  - pip:
+    - -e ./3rdparty/torchdynamo
+    - -e ./3rdparty/torchtext
