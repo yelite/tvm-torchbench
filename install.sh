@@ -1,8 +1,8 @@
 set -euxo pipefail
 
-TVM_GIT_REPO=$2 # e.g. https://github.com/apache/tvm
-TVM_GIT_HASH=$3 # e.g. ada4c46f095f876efd97c4d0a3bf8860d7c5d5e8
-TVM_DIR=~/tvm
+TVM_GIT_REPO=$1 # e.g. https://github.com/apache/tvm
+TVM_GIT_HASH=$2 # e.g. ada4c46f095f876efd97c4d0a3bf8860d7c5d5e8
+TVM_DIR=tvm
 
 cuda_load() {
   export CUDA_HOME="/usr/local/cuda"
@@ -16,7 +16,12 @@ cuda_load() {
   fi
 }
 
-setup_conda_env() {
+setup_conda_env() { 
+  export CONDA_HOME=$HOME/miniconda
+  export PATH="$CONDA_HOME/bin:$PATH"
+  __conda_setup="$($CONDA_HOME/bin/conda 'shell.bash' 'hook' 2> /dev/null)"
+  unset __conda_setup
+
   conda env create -f=./environment.yml -n python-tvm-torchbench
   conda activate python-tvm-torchbench
 }
@@ -37,7 +42,7 @@ clone_and_compile_tvm() {
   echo "set(USE_CURAND ON)"                    >> build/config.cmake
   echo "set(USE_PT_TVMDSOOP ON)"               >> build/config.cmake
 
-  cd build && cmake .. && make tvm -j$(nproc)
+  cd build && cmake .. && make -j$(nproc)
 
   popd
 }
