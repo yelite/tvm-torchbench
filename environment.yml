@@ -10,3 +10,5 @@ dependencies:
   - pip:
     - -e ./3rdparty/torchdynamo
     - -e ./3rdparty/torchtext
+    - synr
+    - xgboost===1.5.0
