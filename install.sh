@@ -4,6 +4,11 @@ TVM_GIT_REPO=$1 # e.g. https://github.com/apache/tvm
 TVM_GIT_HASH=$2 # e.g. ada4c46f095f876efd97c4d0a3bf8860d7c5d5e8
 TVM_DIR=tvm
 
+install_extra_system_packages() {
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -qy
+  source $HOME/.cargo/env
+}
+
 cuda_load() {
   export CUDA_HOME="/usr/local/cuda"
   if [ -d $CUDA_HOME ]; then
@@ -19,11 +24,16 @@ cuda_load() {
 setup_conda_env() { 
   export CONDA_HOME=$HOME/miniconda
   export PATH="$CONDA_HOME/bin:$PATH"
+  set +x
   __conda_setup="$($CONDA_HOME/bin/conda 'shell.bash' 'hook' 2> /dev/null)"
+  eval "$__conda_setup"
   unset __conda_setup
+  set -x
 
-  conda env create -f=./environment.yml -n python-tvm-torchbench
+  conda env create -f=./environment.yml -n python-tvm-torchbench --force
+  set +u
   conda activate python-tvm-torchbench
+  set -u
 }
 
 clone_and_compile_tvm() {
@@ -47,6 +57,14 @@ clone_and_compile_tvm() {
   popd
 }
 
+install_torchbench() {
+  pushd 3rdparty/benchmark
+  python install.py
+  popd 
+}
+
+install_extra_system_packages
 cuda_load
 setup_conda_env
 clone_and_compile_tvm
+install_torchbench
