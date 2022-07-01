@@ -59,7 +59,7 @@ clone_and_compile_tvm() {
 
 install_torchbench() {
   pushd 3rdparty/benchmark
-  python install.py
+  python install.py --continue_on_fail > ../../torchbench_installation.log
   popd 
 }
 
