@@ -5,6 +5,7 @@ TVM_GIT_HASH=$2 # e.g. ada4c46f095f876efd97c4d0a3bf8860d7c5d5e8
 TVM_DIR=tvm
 
 install_extra_system_packages() {
+  sudo apt install -y git-lfs
   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -qy
   source $HOME/.cargo/env
 }
@@ -30,9 +31,9 @@ setup_conda_env() {
   unset __conda_setup
   set -x
 
-  conda env create -f=./environment.yml -n python-tvm-torchbench --force
+  conda env create -f=./environment.yml -n tvm-torchbench --force
   set +u
-  conda activate python-tvm-torchbench
+  conda activate tvm-torchbench
   set -u
 }
 
@@ -58,13 +59,13 @@ clone_and_compile_tvm() {
 }
 
 install_torchbench() {
-  pushd 3rdparty/benchmark
-  python install.py --continue_on_fail > ../../torchbench_installation.log
+  pushd benchmark
+  python install.py --continue_on_fail 2>&1 | tee ../torchbench_installation.log
   popd 
 }
 
 install_extra_system_packages
 cuda_load
 setup_conda_env
-clone_and_compile_tvm
 install_torchbench
+clone_and_compile_tvm
