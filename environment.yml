@@ -3,4 +3,4 @@ channels:
   - defaults
 dependencies:
   - pip:
-    - -e ./3rdparty/torchdynamo
+    - -e ./torchdynamo
