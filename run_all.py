@@ -12,6 +12,8 @@ import importlib.util
 
 logger = logging.getLogger(__name__)
 
+CURRENT_DIRECTORY = os.path.dirpath(os.path.abspath(__file__))
+
 
 @dataclass
 class ModelConfig:
@@ -41,7 +43,9 @@ SKIP = {
 
 def load_torchdynamo_benchmark_batchsize() -> Dict[str, int]:
     result = {}
-    with open("torchdynamo/benchmarks/torchbench_models_list.txt") as f:
+    with open(
+        os.path.join(CURRENT_PATH, "torchdynamo/benchmarks/torchbench_models_list.txt")
+    ) as f:
         for line in f:
             model_name, batch_size = line.split(",")
             result[model_name] = int(batch_size)
@@ -53,7 +57,9 @@ def get_all_models() -> List[ModelConfig]:
 
     model_batch_size = load_torchdynamo_benchmark_batchsize()
 
-    for model_name in os.listdir("benchmark/torchbenchmark/models"):
+    for model_name in os.listdir(
+        os.path.join(CURRENT_PATH, "benchmark/torchbenchmark/models")
+    ):
         batch_size = model_batch_size.get(model_name)
         if model_name in USE_SMALL_BATCH_SIZE:
             batch_size = USE_SMALL_BATCH_SIZE[model_name]
