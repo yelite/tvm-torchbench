@@ -91,8 +91,19 @@ def benchmark_model(
     runner_script_path: str,
 ):
     with tempfile.TemporaryDirectory() as tmpdir:
+        args = [
+            "python",
+            runner_script_path,
+            *passthrough_args,
+            "--work-dir",
+            tmpdir,
+            "--model",
+            model.name,
+            "--batch-size",
+            str(model.batch_size),
+        ]
         result = subprocess.run(
-            ["python", runner_script_path, *passthrough_args, "--work-dir", tmpdir],
+            args=args,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
