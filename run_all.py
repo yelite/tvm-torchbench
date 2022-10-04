@@ -197,7 +197,11 @@ def main():
             )
         except subprocess.CalledProcessError as e:
             failed += 1
-            logger.error("%s failed with stderr: %s", model.name, e.stderr)
+            logger.error("%s failed with stderr: %s", model.name, e.stderr.strip())
+            with open(os.path.join(args.result_dir, f"failed_{model.name}_stdout.log"), "w") as f:
+                f.write(e.stdout)
+            with open(os.path.join(args.result_dir, f"failed_{model.name}_stderr.log"), "w") as f:
+                f.write(e.stderr)
         else:
             finished += 1
             logger.info("%s finished.", model.name)
