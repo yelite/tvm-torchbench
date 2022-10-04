@@ -44,7 +44,9 @@ SKIP = {
 def load_torchdynamo_benchmark_batchsize() -> Dict[str, int]:
     result = {}
     with open(
-        os.path.join(CURRENT_DIRECTORY, "torchdynamo/benchmarks/torchbench_models_list.txt")
+        os.path.join(
+            CURRENT_DIRECTORY, "torchdynamo/benchmarks/torchbench_models_list.txt"
+        )
     ) as f:
         for line in f:
             model_name, batch_size = line.split(",")
@@ -120,7 +122,10 @@ def main():
     arg_parser.add_argument(
         "--runner-script",
         type=str,
-        default="tvm/python/tvm/meta_schedule/testing/torchbench/run.py",
+        default=os.path.join(
+            CURRENT_DIRECTORY,
+            "tvm/python/tvm/meta_schedule/testing/torchbench/run.py",
+        ),
         help="The path to the runner script.",
     )
     arg_parser.add_argument(
