@@ -99,9 +99,15 @@ def benchmark_model(
             tmpdir,
             "--model",
             model.name,
-            "--batch-size",
-            str(model.batch_size),
         ]
+        if model.batch_size:
+            args.extend(
+                [
+                    "--batch-size",
+                    str(model.batch_size),
+                ]
+            )
+
         result = subprocess.run(
             args=args,
             stdout=subprocess.PIPE,
