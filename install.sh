@@ -35,6 +35,8 @@ setup_conda_env() {
   set +u
   conda activate tvm-torchbench
   set -u
+
+  conda install pytorch torchvision torchtext pytorch-cuda=11.6 -c pytorch-nightly -c nvidia -y
 }
 
 clone_and_compile_tvm() {
@@ -64,8 +66,13 @@ install_torchbench() {
   popd 
 }
 
+install_torchdynamo() {
+  pip install -e ./torchdynamo
+}
+
 install_extra_system_packages
 cuda_load
 setup_conda_env
 install_torchbench
+install_torchdynamo
 clone_and_compile_tvm
