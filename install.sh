@@ -48,7 +48,7 @@ clone_and_compile_tvm() {
   cp cmake/config.cmake build/config.cmake
   echo "set(CMAKE_BUILD_TYPE Release)"         >> build/config.cmake
   echo "set(CMAKE_EXPORT_COMPILE_COMMANDS ON)" >> build/config.cmake
-  echo "set(USE_LLVM ON)"                      >> build/config.cmake
+  echo "set(USE_LLVM /usr/bin/llvm-config-11)" >> build/config.cmake
   echo "set(USE_CUDA ON)"                      >> build/config.cmake
   echo "set(USE_CURAND ON)"                    >> build/config.cmake
   echo "set(USE_PT_TVMDSOOP ON)"               >> build/config.cmake
