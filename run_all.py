@@ -3,6 +3,7 @@ import logging
 from typing import Dict, Optional, List
 from dataclasses import dataclass
 import os
+import re
 import shutil
 import sys
 import subprocess
@@ -54,14 +55,22 @@ def load_torchdynamo_benchmark_batchsize() -> Dict[str, int]:
     return result
 
 
-def get_all_models() -> List[ModelConfig]:
+def get_all_models(model_regex=".*") -> List[ModelConfig]:
     models = []
 
     model_batch_size = load_torchdynamo_benchmark_batchsize()
+    model_dir = os.path.join(CURRENT_DIRECTORY, "benchmark/torchbenchmark/models")
 
-    for model_name in os.listdir(
-        os.path.join(CURRENT_DIRECTORY, "benchmark/torchbenchmark/models")
-    ):
+    model_regex = re.compile(model_regex)
+
+    for model_name in os.listdir(model_dir):
+        if not os.path.isdir(os.path.join(model_dir, model_name)):
+            continue
+
+        skip = False
+        skip = skip or (not re.match(model_regex, model_name))
+        skip = skip or model_name in SKIP
+
         batch_size = model_batch_size.get(model_name)
         if model_name in USE_SMALL_BATCH_SIZE:
             batch_size = USE_SMALL_BATCH_SIZE[model_name]
@@ -69,7 +78,7 @@ def get_all_models() -> List[ModelConfig]:
         models.append(
             ModelConfig(
                 name=model_name,
-                skip=model_name in SKIP,
+                skip=skip,
                 batch_size=batch_size,
             )
         )
@@ -137,6 +146,17 @@ def main():
         help="The directory to store benchmark result.",
     )
     arg_parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Whether to skip running the actual benchmark.",
+    )
+    arg_parser.add_argument(
+        "--models",
+        type=str,
+        default=".*",
+        help="Filter models to run by regex.",
+    )
+    arg_parser.add_argument(
         "--runner-script",
         type=str,
         default=os.path.join(
@@ -176,7 +196,7 @@ def main():
     failed = 0
     finished = 0
 
-    for model in get_all_models():
+    for model in get_all_models(args.models):
         if model.skip:
             skipped += 1
             logger.info("%s skipped.", model.name)
@@ -191,6 +211,11 @@ def main():
             continue
 
         logging.info("%s started.", model.name)
+
+        if args.dry_run:
+            logger.info("%s skipped as it's in dry run.", model.name)
+            continue
+
         try:
             benchmark_model(
                 model, model_result_dir, passthrough_args, args.runner_script
@@ -202,9 +227,10 @@ def main():
                 f.write(e.stdout)
             with open(os.path.join(args.result_dir, f"failed_{model.name}_stderr.log"), "w") as f:
                 f.write(e.stderr)
-        else:
-            finished += 1
-            logger.info("%s finished.", model.name)
+            continue
+
+        finished += 1
+        logger.info("%s finished.", model.name)
 
     logger.info(
         "Finished all tasks. success: %d, failed: %d, skipped: %d",
