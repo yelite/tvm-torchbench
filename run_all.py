@@ -32,6 +32,17 @@ USE_SMALL_BATCH_SIZE = {
     "densenet121": 4,
     "hf_Reformer": 4,
     "timm_efficientdet": 1,
+
+    # The following models causes OOM on AWS p3. Lowering the batch size to try to reduce memory usage.
+    "hf_Albert": 1,
+    "hf_Bart": 1,
+    "hf_Bert": 1,
+    "hf_T5": 1,
+    "hf_T5_base": 1,
+    "nvidia_deeprecommender": 1,
+    "pytorch_unet": 1,
+    "LearningToPaint": 1,
+    "hf_GPT2": 1,
 }
 
 SKIP = {
