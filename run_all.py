@@ -43,6 +43,7 @@ USE_SMALL_BATCH_SIZE = {
     "pytorch_unet": 1,
     "LearningToPaint": 1,
     "hf_GPT2": 1,
+    "BERT_pytorch": 1,
 }
 
 SKIP = {
