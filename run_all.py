@@ -43,7 +43,10 @@ USE_SMALL_BATCH_SIZE = {
     "pytorch_unet": 1,
     "LearningToPaint": 1,
     "hf_GPT2": 1,
+    "hf_GPT2_large": 1,
     "BERT_pytorch": 1,
+    "resnext50_32x4d": 8,
+    "squeezenet1_1": 1,
 }
 
 SKIP = {
@@ -86,6 +89,12 @@ def get_all_models(model_regex=".*") -> List[ModelConfig]:
         batch_size = model_batch_size.get(model_name)
         if model_name in USE_SMALL_BATCH_SIZE:
             batch_size = USE_SMALL_BATCH_SIZE[model_name]
+        if model_name.startswith("detectron2"):
+            # detectron2 with batch size 1 will cause shape mismatch
+            # in the PyTorch frontend.
+            batch_size = 2
+        if model_name.startswith("timm"):
+            batch_size = 1
 
         models.append(
             ModelConfig(
